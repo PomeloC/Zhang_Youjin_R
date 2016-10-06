@@ -13,31 +13,38 @@ output: word_document
 #g) (4,4,...,4,	6,6,...,6,	3,3,...,3)	where	there	are	10	occurrences	of	4,	20	
 #occurrences	of	6	and	30	occurrences	of	3.	
 ```{R 1a}
+#a
 (1:20)
 ```
 
 ```{R 1b}
+#b
 (20:1)
 ```
 
 ```{R 1c}
+#c
 c(1:20,19:1)
 ```
 
 ```{R 1d}
+#d
 tmp <- c(4,6,3)
 ```
 
 #using repitition functions
 ```{R 1e}
+#e
 rep(c(4,6,3), 10)
 ```
 
 ```{R 1f}
+#f
 rep(c(4,6,3), len=31)
 ```
 
 ```{R 1g}
+#g
 rep(c(4,6,3), c(10,20,30))
 ```
 
@@ -49,21 +56,25 @@ exp(x)*cos(x)
 
 #3
 ```{R 3a}
+#a
 (0.1^seq(3,36,by=3))*(0.2^seq(1,34,by=3))
 ```
 
 ```{R 3b}
+#b
 (2^seq(1,25))/(1:25)
 ```
 
 #4
 ```{R 4a}
+#a
 i <- (10:100)
 y <- i^3+4i^2
 sum(y)
 ```
 
 ```{R 4b}
+#b
 i <- (1:25)
 y <- 2^i/i+3^i/i^2
 sum(y)
@@ -74,10 +85,12 @@ sum(y)
 between	label	and	the	number	following.
 #b) ("fn1",	"fn2",	...,	"fn30").	In	this	case,	there	is	no	space	between	fn and	the	number	following.
 ```{R 5a}
+#a
 paste("label",1:30)
 ```
 
 ```{R 5b}
+#b
 paste("fn",1:30,sep="")
 ```
 
