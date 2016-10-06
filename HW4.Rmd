@@ -1,6 +1,6 @@
 ---
 title: "HW4"
-output: word_document
+output: html_document
 ---
 #1 Create	the	vectors
 #a) (1,2,3,...,19,20)
