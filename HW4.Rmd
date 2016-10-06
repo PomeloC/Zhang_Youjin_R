@@ -55,6 +55,7 @@ rep(c(4,6,3), c(10,20,30))
 #2 Create	a	vector	of	the	values	of	(e^x)cos(x)	at	x	=	3,3.1,3.2,...,5.9,6.
 ```{R 2}
 #using in-buit sequence function
+#assign value to x
 x <- seq(3,6,0.1)
 exp(x)*cos(x)
 #use exp(x) to express "e"
@@ -63,6 +64,7 @@ exp(x)*cos(x)
 #3
 ```{R 3a}
 #a
+#assign value to x and y
 x <- 0.1^seq(3,36,by=3)
 y <- 0.2^seq(1,34,by=3)
 x*y
@@ -70,6 +72,7 @@ x*y
 
 ```{R 3b}
 #b
+#assign value to c
 c <- (1:25)
 2^c/c
 ```
@@ -77,14 +80,18 @@ c <- (1:25)
 #4
 ```{R 4a}
 #a
+#assign value to i
 i <- (10:100)
+#build function into y
 y <- i^3+4i^2
 sum(y)
 ```
 
 ```{R 4b}
 #b
+#assign value to i
 i <- (1:25)
+#build function into y
 y <- 2^i/i+3^i/i^2
 sum(y)
 ```
