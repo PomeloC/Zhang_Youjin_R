@@ -1,4 +1,5 @@
 ---
+Author: "Youjin Zhang
 title: "HW4"
 output: html_document
 ---
