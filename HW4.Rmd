@@ -50,6 +50,7 @@ rep(c(4,6,3), c(10,20,30))
 
 #2 Create	a	vector	of	the	values	of	(e^x)cos(x)	at	x	=	3,3.1,3.2,...,5.9,6.
 ```{R 2}
+#using in-buit sequence function
 x <- seq(3,6,0.1)
 exp(x)*cos(x)
 ```
@@ -62,7 +63,8 @@ exp(x)*cos(x)
 
 ```{R 3b}
 #b
-(2^seq(1,25))/(1:25)
+c <- (1:25)
+2^c/c
 ```
 
 #4
@@ -81,8 +83,7 @@ sum(y)
 ```
 
 #5 Use	the	function	paste	to	create	the	following	character	vectors	of	length	30:
-#a) ("label	1",	"label	2",	.....,	"label	30"). Note	that	there	is	a	single	space	
-between	label	and	the	number	following.
+#a) ("label	1",	"label	2",	.....,	"label	30"). Note	that	there	is	a	single	space	 between	label	and	the	number	following.
 #b) ("fn1",	"fn2",	...,	"fn30").	In	this	case,	there	is	no	space	between	fn and	the	number	following.
 ```{R 5a}
 #a
@@ -104,7 +105,7 @@ yVec[-1] - xVec[-length(xVec)]
 sin(yVec[-length(yVec)]) / cos(xVec[-1])
 #(c) 
 xVec[-c(249,250)] + 2*xVec[-c(1,250)]-xVec[-c(1,2)]
-or, for an answer which works whatever the length of xVec,
+#or, for an answer which works whatever the length of xVec,
 xVecLen <- length(xVec)
 xVec[-c(xVecLen-1,xVecLen)] + 2*xVec[-c(1,xVecLen)] - xVec[-c(1,2)]
 #(d) 
@@ -118,7 +119,8 @@ yVec <- sample(0:999, 250, replace=T)
 #(a) 
 yVec[yVec>600]
 #(b) 
-(1:len(yVec))[yVec>600] or which(yVec>600)
+(1:length(yVec))[yVec>600] #or which
+(yVec>600)
 #(c) 
 xVec[yVec>600]
 #(d) 
