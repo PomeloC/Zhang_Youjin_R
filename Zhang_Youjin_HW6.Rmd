@@ -1,0 +1,79 @@
+---
+title: "gglot"
+author: "Youjin Zhang"
+date: "October 13, 2016"
+output: html_document
+---
+
+library("ggplot2")
+library("grid")
+```{r}
+#question1 histogram for columns
+lapply(diamonds,class)#determine the type of each column
+str(diamonds)
+column_num <- diamonds[sapply(diamonds, is.numeric)]#find numeric columns
+column_num=as.data.frame(column_num)
+hist(column_num$carat)
+for (i in 1:dim(column_num)[2]) {
+hist(column_num[,i])}
+column_num+geom_histogram(binwidth = 0.2) 
+}
+```
+
+```{r}
+#question2 Create	a	simple	scatter	plot	of	Weight (“Carat”) and	Price using	Color	(the	“Color” column	in	the	diamonds	dataframe)	as	a	facet. 
+
+ggplot(diamonds,aes(x=carat,y=price,colour=factor(color)))+
+  geom_point()+
+       xlab("weight")+
+       ylab("price")+
+  ggtitle("Diamonds-Weight to Price by Color")
+    
+```
+
+```{r}
+#quetsion3
+#nonlinear regression
+ggplot(diamonds,aes(x=log(carat),y=log(price),colour=factor(color)))+
+  geom_point()+
+       xlab("weight")+
+       ylab("price")+
+  ggtitle("Weight to Price (Linear)")
+```
+
+```{r}
+#question4
+#residuals
+diamonds_lm <- lm(log(price)~log(carat),diamonds)
+ggplot(diamonds,aes(x=log(carat),y=resid(diamonds_lm),colour=factor(color)))+
+  geom_point()+
+       xlab("weight")+
+       ylab("price residuals")+
+  ggtitle("Weight to Price by Color")
+
+```
+
+```{r}
+#question5
+#draw density	histogram	of	the	price
+hist_carat <- ggplot(diamonds,aes(carat,colour=factor(color)))+geom_histogram(aes(y=..density..),binwidth=0.05) +
+              theme(axis.title.x=element_blank(),axis.title.y=element_blank(),legend.position='none')
+hist_price <- ggplot(diamonds,aes(price,fill=factor(color)))+geom_histogram(aes(y=..density..),binwidth=100) +
+              theme(axis.title.x=element_blank(),axis.title.y=element_blank(),legend.position='none')
+  # make two density histograms and name them as hist_carat and hist_price
+  # take off axis name and 'factor(color)' as sample figure shows
+diamonds_lm = lm(log(price) ~ log(carat), diamonds) 
+ggplot(diamonds,aes(log(carat), resid(diamonds_lm),color=factor(color)))+geom_point()+
+  labs(title="Diamonds - Weight to Price by Color",x='Weight',y='Price Residuals')+
+  theme(plot.title=element_text(colour='blue'),legend.position='top')
+  # repeat steps in #4 again to make background graph
+vp1 <- viewport(w=0.4,h=0.2,x=0.25,y=0.16)
+  # define the position of hist_price
+vp2 <- viewport(w=0.4,h=0.2,x=0.82,y=0.75)
+  # define the position of hist_carat
+print(hist_price, vp = vp1)
+print(hist_carat, vp = vp2)
+  # place hist_price on position vp1, and hist_carat on position vp2
+
+```
+
