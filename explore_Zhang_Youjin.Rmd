@@ -1,0 +1,235 @@
+---
+title: "explore"
+author: "Youjin Zhang"
+date: "October 27, 2016"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+##the following code breaks down function explore() into its small component functions and each function
+##performs one specific task within the function explore()
+
+#installing and loading required packages
+install.packages("ggplot2")
+install.packages("gridExtra")
+require(ggplot2)
+require(gridExtra)
+
+
+#creating a dataframe for testing purpose
+A <- c(1,2,3,4,5)
+B <- c(6,7,8,9,10)
+C <- c("a","b","c","d","e")
+D <- c(11,12,13,14,15)
+
+test <- data.frame(A,B,C,D)
+
+
+##1. returning a frequency table for every categorical and logical variable
+function1 <- function(df) {
+  
+  #selecting only categorical and logical variable columns in the dataframe
+  NoneNumC <- df[!sapply(df, is.numeric)]
+  #creating a frequency table
+  freq_table <- sapply(NoneNumC,table)
+  
+  return (freq_table)
+  
+}
+
+##testing with test dataframe
+function1(test)
+
+##2.a. returning a summary table for each numerical variable
+function2a <- function(df) {
+  
+  #selecting only numerical variable columns in the dataframe
+  NumC <- df[sapply(df, is.numeric)]
+  #creating a summary table
+  summary_table <- summary(NumC)
+  
+  return (summary_table)
+  
+}
+
+##testing with test dataframe
+function2a(test)
+
+##2.b. returning a dataframe with r-square values
+function2b <- function(df) {
+  
+  #selecting only numerical variable columns in the dataframe
+  NumC <- df[sapply(df, is.numeric)]
+  
+  if (ncol(NumC) < 2) #if the number of numerical columns is not big enough for calculating r-square values
+    output <- "r-square values not available"
+  
+  else
+    comb2 <- combn(colnames(NumC), 2)   # generating all possible combinations of the column names in pairs
+    pairName <- paste(comb2[1,], comb2[2,], sep="~")  # using paste() to create a vector of all non-repetative possible name pairs
+    
+    mCor <- cor(NumC, method = "pearson")    # using cor() to create a table of Pearson correlation coefficients between each pair of columns, with repetition.
+    pairCor <- mCor[lower.tri(mCor)]   # extracting values from the lower trangle of the above-mentioned table, which are the correlation coefficient values for the pair columns without repetition
+    
+    r_square <- pairCor^2   # squared Pearson correlation coefficients are r-square values
+    
+    r_data <- data.frame(pairName,r_square)  # creating a dataframe with the pair name columns and r square values
+    names(r_data) <- c("Variable Pairs","R-Square")   # renaming the columns
+    
+    output <- r_data
+    
+  return (output) 
+  
+}
+
+##testing with test dataframe
+function2b(test)
+
+##2.c. returning a dataframe with Pearson coefficients beyond a threshold
+function2c <- function(df,t) {
+  
+  #selecting only numerical variable columns in the dataframe
+  NumC <- df[sapply(df, is.numeric)]
+  
+  if (ncol(NumC) < 2) #if the number of numerical columns is not big enough for calculating correlations
+    output <- "Pearson coefficients not available"
+  
+  else
+    comb2 <- combn(colnames(NumC), 2)   # generating all possible combinations of the column names in pairs
+    pairName <- paste(comb2[1,], comb2[2,], sep="-")  # using paste() to create a vector of all non-repetative possible name pairs
+  
+    mCor <- cor(NumC, method = "pearson")    # using cor() to create a table of Pearson correlation coefficients between each pair of columns, with repetition.
+    pairCor <- mCor[lower.tri(mCor)]   # extracting values from the lower trangle of the above-mentioned table, which are the correlation coefficient values for the pair columns without repetition
+    # the pairCor vector contains correlation values in corresponding order as the pairName vector
+    
+    corData <- data.frame(pairName, pairCor)   # creating a new dataframe with the two columns from above
+    corData <- subset(corData,abs(pairCor) > t) # selecting only the coefficients beyond the given threshold
+    names(corData) <- c("Variable Pairs","Pearson Exceeds Threshold")   # renaming the columns with the names provided
+  
+    output <-corData
+    
+  return (output)
+    
+}
+
+##testing with test dataframe
+function2c(test,0.7)
+
+##3. If the plot switch parameter is “on” or “grid”, then plot a pair of
+##   blue histograms with a vertical red line at the mean (one using counts and the other density)
+##   for every numerical variable at each number of bins integer specified in the bin vector parameter.
+##   If the plot switch is set to “grid”, there should be a grid for each count-bin combination and a separate
+##   grid for each density-bin size combination.
+
+function3 <- function(df,ch="off",binsizes=(30)) {
+  
+  #selecting only numerical variable columns in the dataframe
+  NumC <- df[sapply(df, is.numeric)]
+
+  if (ch == "on")    #if the switch is given "on"
+    for (i in 1:ncol(NumC)) {
+      for (j in 1:length(binsizes)) {     # iterating through each numerical column and each bin size
+        x <- (max(NumC[[i]]) - min(NumC[[i]]))/j   # calculating each bin width
+        m <- mean(NumC[[i]])
+        column_count_plot <- ggplot(NumC[i],aes(x=NumC[[i]])) + geom_histogram(fill="blue",binwidth=x) + geom_vline(xintercept = m, color = "red") + labs(x=names(NumC[i]))
+        # plotting count plot as required
+        
+        column_density_plot <- ggplot(NumC[i],aes(x=NumC[[i]])) + geom_histogram(aes(y=..density..),fill="blue",binwidth=x) + geom_vline(aes(xintercept=m, color="red")) + labs(y="density",x=names(NumC[i]))
+        # plotting density plot as required
+        
+        print(column_count_plot)
+        print(column_density_plot)
+        
+      }
+      
+    }
+  else if (ch == "grid")  #if the switch is given "grid"
+    for (j in 1:length(binsizes)) {
+      count_plot_list <- list()    # creating an empty list for count plots
+      density_plot_list <- list()   # creating an empty list for density plots
+      
+      for (i in 1:ncol(NumC)){
+      
+        x <- (max(NumC[[i]]) - min(NumC[[i]]))/j   # calculating each bin width
+        
+        #plotting count plot and adding it in count_plot_list
+        count_plot_list[[i]] <- ggplot(NumC,aes(x=NumC[[i]])) + geom_histogram(fill="blue", binwidth=x) + labs(x=names(NumC[i]))
+        
+        #plotting density plot and adding it in density_plot_list
+        density_plot_list[[i]] <- ggplot(NumC,aes(x=NumC[[i]])) + geom_histogram(fill="blue", binwidth=x) + aes(y=..density..) + labs(y="density", x=names(NumC[i]))
+        
+        
+      }
+      
+      #using grid.arrange to put the two plot lists for each bin size in grids
+      grid.arrange(grobs=count_plot_list,ncol=2)
+      grid.arrange(grobs=density_plot_list,ncol=2)
+        
+    }
+   
+     
+}
+
+b <- c(5,10,15)
+function3(test,"grid",b)
+
+##4. If the plot switch parameter is “on” or “grid”, plot a gray bar graph for every categorical
+##   and binary variable.
+
+function4 <- function(df,ch) {
+  
+  if ((ch == "on") | (ch == "grid")) #if plot switch parameter is "on" or "grid"
+    
+    #obtaining all categorical and binary variable in dataframe
+    myC <- df[(sapply(df, is.factor)) | apply(df,2,function(x) { all(na.omit(x) %in% 0:1) })]
+  
+    #plotting a gray bar graph for every column variable of myC dataframe consisting of categorial and binary columns
+    for (i in 1:ncol(myC)) {
+      bar_graph <- ggplot(myC[i],aes(x=myC[[i]])) + geom_bar(fill="gray") + labs(x=names(myC[i]))
+      
+      #plotting each bar graph for every column in myC
+      print(bar_graph)
+      
+      
+    }
+
+  
+}
+
+#testing with test dataframe
+function4(test,"on")
+
+
+##the following code makes use of the individual functions above and integrates them into explore() function
+
+explore <- function(df,ch="off",t=0.2,binsizes=30) {
+  
+  #creating an empty R list to store the returned objects
+  myList <- list()
+  
+  #using function1 to return and add to the list a frequency table
+  myList[[1]] <- function1(df)
+  
+  #using function2a to return and add a summary table
+  myList[[2]] <- function2a(df)
+  
+  #using function2b to return and add a dataframe with R-square values
+  myList[[3]] <- function2b(df)
+  
+  #using function2c to return and add a dataframe with Pearson coefficients beyond threshold
+  myList[[4]] <- function2c(df,t)
+  
+  #using function3 and function4 to create required grids and plots
+  function3(df,ch,binsizes)
+  function4(df,ch)
+  
+  return (myList)
+  
+}
+
+#testing the explore() function
+b <- c(5,10,15)
+explore(test,ch="grid",t=0.2,b)
